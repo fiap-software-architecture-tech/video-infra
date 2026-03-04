@@ -36,41 +36,11 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
 }
 
 # S3 bucket for video storage
-resource "aws_s3_bucket" "video_bucket" {
-  bucket = "video-core-videos-${var.environment}"
+resource "aws_s3_bucket" "video-bucket" {
+  bucket = "${var.bucket_video_files}"
 
   tags = {
     Name        = "Video Storage Bucket"
     Description = "Stores uploaded videos"
-  }
-}
-
-resource "aws_s3_bucket_versioning" "video_bucket" {
-  bucket = aws_s3_bucket.video_bucket.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "video_bucket" {
-  bucket = aws_s3_bucket.video_bucket.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_cors_configuration" "video_bucket" {
-  bucket = aws_s3_bucket.video_bucket.id
-
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "PUT", "POST", "DELETE"]
-    allowed_origins = ["*"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3000
   }
 }
