@@ -1,0 +1,106 @@
+name: 🏗️ Deploy Infrastructure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/deploy-infra.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./terraform
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: 🔧 Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+          terraform_wrapper: true
+
+      - name: 🎬 Terraform Init
+        run: terraform init
+
+      - name: ✅ Terraform Validate
+        run: terraform validate
+
+      - name: 📋 Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: 🚀 Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: 📤 Get Terraform Outputs
+        id: terraform-output
+        run: |
+          echo "ecr_repository_url=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
+          echo "ecr_repository_name=$(terraform output -raw ecr_repository_name)" >> $GITHUB_OUTPUT
+          echo "ecs_cluster_name=$(terraform output -raw ecs_cluster_name)" >> $GITHUB_OUTPUT
+          echo "ecs_service_name=$(terraform output -raw ecs_service_name)" >> $GITHUB_OUTPUT
+
+      - name: 📊 Infrastructure Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Infrastructure deployed successfully!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "Use these values to deploy the application:"
+          echo ""
+          echo "📦 ECR Repository URL:"
+          echo "   ${{ steps.terraform-output.outputs.ecr_repository_url }}"
+          echo ""
+          echo "🏷️  ECR Repository Name:"
+          echo "   ${{ steps.terraform-output.outputs.ecr_repository_name }}"
+          echo ""
+          echo "🎯 ECS Cluster Name:"
+          echo "   ${{ steps.terraform-output.outputs.ecs_cluster_name }}"
+          echo ""
+          echo "🚀 ECS Service Name:"
+          echo "   ${{ steps.terraform-output.outputs.ecs_service_name }}"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "🔄 Next Steps:"
+          echo "1. Go to: https://github.com/fiap-software-architecture-tech/video-core/actions/workflows/deploy-app.yml"
+          echo "2. Click 'Run workflow'"
+          echo "3. Paste the values above"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: 💾 Save outputs to file
+        run: |
+          cat > infrastructure-outputs.txt << EOF
+          ECR_REPOSITORY_URL=${{ steps.terraform-output.outputs.ecr_repository_url }}
+          ECR_REPOSITORY_NAME=${{ steps.terraform-output.outputs.ecr_repository_name }}
+          ECS_CLUSTER_NAME=${{ steps.terraform-output.outputs.ecs_cluster_name }}
+          ECS_SERVICE_NAME=${{ steps.terraform-output.outputs.ecs_service_name }}
+          EOF
+          
+          echo "📝 Outputs saved to infrastructure-outputs.txt"
+          cat infrastructure-outputs.txt
+
+      - name: 📤 Upload outputs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: infrastructure-outputs
+          path: terraform/infrastructure-outputs.txt
+          retention-days: 90

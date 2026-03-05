@@ -27,3 +27,17 @@ variable "sqs_video-processed-queue" {
   type = string
   default = "video-processed-queue"
 }
+
+variable "db_password" {
+  description = "Password for RDS database"
+  type        = string
+  sensitive   = true
+  default     = "videocore123"
+}
+
+variable "jwt_secret" {
+  description = "Secret key for JWT token generation"
+  type        = string
+  sensitive   = true
+  default     = "your-secret-key-change-in-production"
+}

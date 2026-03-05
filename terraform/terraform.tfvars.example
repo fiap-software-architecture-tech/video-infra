@@ -1,2 +1,8 @@
 aws_region  = "us-east-1"
 environment = "dev"
+
+# Database password (CHANGE THIS!)
+db_password = "your-secure-password-here"
+
+# JWT Secret (CHANGE THIS!)
+jwt_secret = "your-jwt-secret-key-here"

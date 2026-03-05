@@ -115,6 +115,33 @@ video-infra/
 - Revise sempre o `terraform plan` antes de aplicar
 - Use tags consistentes em todos os recursos
 
+## 🚀 CI/CD com GitHub Actions
+
+Este repositório possui workflow automatizado para deploy da infraestrutura.
+
+### Configuração Inicial
+
+1. Configure os secrets no GitHub:
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `AWS_SESSION_TOKEN` (se usar AWS Academy)
+
+2. O workflow roda automaticamente em push para `main` com mudanças em `terraform/**`
+
+3. Também pode ser executado manualmente via Actions tab
+
+### Documentação Completa
+
+📖 **Veja:** [DEPLOYMENT.md](DEPLOYMENT.md) para guia completo de deploy via GitHub Actions
+
+### Outputs do Deploy
+
+Após o deploy, o workflow exibe os outputs necessários para configurar o repositório [video-core](https://github.com/fiap-software-architecture-tech/video-core):
+- ECR Repository URL
+- ECR Repository Name
+- ECS Cluster Name
+- ECS Service Name
+
 ## 🧹 Destruir recursos
 
 Para remover todos os recursos criados:
@@ -124,3 +151,8 @@ terraform destroy
 ```
 
 **⚠️ CUIDADO:** Isso removerá permanentemente todos os recursos, incluindo buckets e dados
+
+## 🔗 Repositórios Relacionados
+
+- **Aplicação**: [video-core](https://github.com/fiap-software-architecture-tech/video-core) - Aplicação Node.js
+- **Infraestrutura**: video-infra (este repositório) - Provisionamento AWS

@@ -1,5 +1,5 @@
 # ===========================
-# DATA SOURCES & LOCALS
+# DATA SOURCES
 # ===========================
 
 # Data sources para recursos existentes
@@ -19,12 +19,4 @@ data "aws_subnet" "fiapx_subnet_1b" {
 # IAM Role do AWS Academy
 data "aws_iam_role" "lab_role" {
   name = "LabRole"
-}
-
-# Lista das subnets para o RDS
-locals {
-  rds_subnet_ids = [
-    data.aws_subnet.fiapx_subnet_1a.id,  # us-east-1a
-    data.aws_subnet.fiapx_subnet_1b.id,  # us-east-1b
-  ]
 }
