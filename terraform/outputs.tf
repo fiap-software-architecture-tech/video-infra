@@ -44,6 +44,11 @@ output "vpc_id" {
   value       = data.aws_vpc.existing.id
 }
 
+output "aws_region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
 output "lab_role_arn" {
   description = "ARN of the AWS Academy LabRole"
   value       = data.aws_iam_role.lab_role.arn
@@ -127,4 +132,52 @@ output "database_url" {
   description = "Complete database connection URL"
   value       = "mysql://${aws_db_instance.video_core.username}:${var.db_password}@${aws_db_instance.video_core.endpoint}/${aws_db_instance.video_core.db_name}"
   sensitive   = true
+}
+
+# Lambda Outputs
+output "lambda_function_name" {
+  description = "Name of the video processing Lambda function"
+  value       = aws_lambda_function.video_processing.function_name
+}
+
+output "lambda_function_arn" {
+  description = "ARN of the video processing Lambda function"
+  value       = aws_lambda_function.video_processing.arn
+}
+
+output "lambda_function_url" {
+  description = "URL endpoint for the Lambda function"
+  value       = aws_lambda_function_url.video_processing.function_url
+}
+
+output "lambda_log_group" {
+  description = "CloudWatch log group for Lambda"
+  value       = aws_cloudwatch_log_group.video_processing_lambda.name
+}
+
+# Aliases for easier access
+output "s3_bucket_name" {
+  description = "Alias for video-bucket_name"
+  value       = aws_s3_bucket.video-bucket.id
+}
+
+output "db_name" {
+  description = "Alias for rds_database_name"
+  value       = aws_db_instance.video_core.db_name
+}
+
+output "db_username" {
+  description = "Alias for rds_username"
+  value       = aws_db_instance.video_core.username
+  sensitive   = true
+}
+
+output "sqs_queue_url" {
+  description = "Alias for video_job_queue_url"
+  value       = aws_sqs_queue.video_job_queue.url
+}
+
+output "ecr_repository_url_core" {
+  description = "Alias for ecr_repository_url"
+  value       = aws_ecr_repository.video_core.repository_url
 }

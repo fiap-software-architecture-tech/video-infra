@@ -5,7 +5,7 @@ resource "aws_sqs_queue" "video_job_queue" {
   max_message_size           = 262144
   message_retention_seconds  = 345600  # 4 days
   receive_wait_time_seconds  = 0
-  visibility_timeout_seconds = 30
+  visibility_timeout_seconds = 960  # 16 minutes (maior que timeout da Lambda de 15min)
 
   tags = {
     Name        = "Video Events Queue"

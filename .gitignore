@@ -25,3 +25,9 @@ terraform.rc
 
 # Lock file
 .terraform.lock.hcl
+
+# Lambda deployment packages (except placeholder)
+**/video-processing-service.zip
+
+# Placeholder is committed to repo
+!**/lambda-placeholder.zip

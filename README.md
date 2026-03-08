@@ -20,8 +20,53 @@ O **video-infra** centraliza todos os artefatos necessários para subir e operar
   - Terraform state backend (com versionamento e criptografia)
   - Video storage (com CORS, lifecycle policy e versionamento)
 - **SQS Queues:**
-  - video-events (fila principal)
-  - video-events-dlq (dead letter queue)
+  - video-processing-jobs-queue (fila principal para processamento)
+  - video-processing-jobs-queue-dlq (dead letter queue)
+  - video-processed-queue (fila de vídeos processados)
+- **ECR (Elastic Container Registry):**
+  - video-core-image (imagens Docker do video-core)
+- **ECS (Elastic Container Service):**
+  - Cluster ECS Fargate
+  - Task Definition e Service para video-core API
+- **RDS (Relational Database Service):**
+  - MySQL 8.0 (db.t3.micro)
+  - Security Groups configurados
+- **Lambda:**
+  - video-processing-service (processamento assíncrono de vídeos)
+  - CloudWatch Logs
+  - Event Source Mapping com SQS
+
+## 🎬 Video Processing Lambda
+
+A Lambda `video-processing-service` é responsável por processar vídeos de forma assíncrona:
+
+- **Runtime**: Node.js 20.x
+- **Timeout**: 15 minutos (900 segundos)
+- **Memória**: 1GB
+- **Trigger**: Mensagens na fila SQS (video-processing-jobs-queue)
+- **Batch Size**: 1 mensagem por vez
+
+### Separação de Responsabilidades
+
+**Este repositório (video-infra)** cria apenas a estrutura da Lambda:
+- ✅ Lambda function (sem código)
+- ✅ IAM Roles
+- ✅ VPC Configuration
+- ✅ Event Source Mapping com SQS
+- ✅ CloudWatch Log Group
+
+**O repositório video-processing-service** é responsável por:
+- ✅ Código da aplicação
+- ✅ Build e deploy do código
+- ✅ Script `deploy-lambda.sh`
+
+### Como funciona
+
+1. `terraform apply` cria a Lambda com um placeholder
+2. Script `deploy-lambda.sh` (no video-processing-service) faz upload do código real
+3. Atualizações de código não requerem `terraform apply`
+
+Para mais detalhes, consulte [LAMBDA_DEPLOY.md](LAMBDA_DEPLOY.md).
 
 ## 📋 Pré-requisitos
 
@@ -94,8 +139,14 @@ video-infra/
     ├── main.tf              # Provider AWS e configurações principais
     ├── variables.tf         # Definição de variáveis
     ├── outputs.tf           # Outputs dos recursos criados
+    ├── data-sources.tf      # Data sources (VPC, subnets, IAM roles)
     ├── s3.tf                # Recursos S3 (buckets)
     ├── sqs.tf               # Recursos SQS (filas)
+    ├── ecr.tf               # Elastic Container Registry
+    ├── ecs.tf               # ECS Fargate (cluster, task, service)
+    ├── rds.tf               # RDS MySQL e Security Groups
+    ├── lambda.tf            # Lambda function para processamento de vídeos
+    ├── locals.tf            # Variáveis locais
     ├── versions.tf          # Versões do Terraform e providers
     └── terraform.tfvars.example  # Exemplo de variáveis
 ```
