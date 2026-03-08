@@ -43,6 +43,10 @@ locals {
       value = aws_sqs_queue.video_job_queue.url
     },
     {
+      name  = "AWS_SQS_PROCESSED_URL"
+      value = aws_sqs_queue.video_processed_queue.url
+    },
+    {
       name  = "DATABASE_URL"
       value = "mysql://${aws_db_instance.video_core.username}:${var.db_password}@${aws_db_instance.video_core.endpoint}/${aws_db_instance.video_core.db_name}"
     },

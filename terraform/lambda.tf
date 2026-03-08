@@ -49,12 +49,6 @@ resource "aws_lambda_function" "video_processing" {
     size = 2048  # 2GB
   }
   
-  # Configuração de VPC - usando mesmas subnets e security group do ECS
-  vpc_config {
-    subnet_ids         = local.rds_subnet_ids
-    security_group_ids = [aws_security_group.ecs_tasks.id]
-  }
-  
   # Variáveis de ambiente
   environment {
     variables = {
