@@ -41,3 +41,17 @@ variable "jwt_secret" {
   sensitive   = true
   default     = "your-secret-key-change-in-production"
 }
+
+variable "resend_api_key" {
+  description = "Resend API Key for sending emails"
+  type        = string
+  sensitive   = true
+  default     = "re_D7fXDbUL_4HtuHvSnkn6TLtTTwEnbXZCR"
+}
+
+variable "email_from" {
+  description = "Email address to send emails from"
+  type        = string
+  default     = "noreply@resend.dev"
+}
+

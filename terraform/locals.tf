@@ -47,6 +47,14 @@ locals {
       value = aws_sqs_queue.video_processed_queue.url
     },
     {
+      name  = "RESEND_API_KEY"
+      value = var.resend_api_key
+    },
+    {
+      name  = "EMAIL_FROM"
+      value = var.email_from
+    },
+    {
       name  = "DATABASE_URL"
       value = "mysql://${aws_db_instance.video_core.username}:${var.db_password}@${aws_db_instance.video_core.endpoint}/${aws_db_instance.video_core.db_name}"
     },
